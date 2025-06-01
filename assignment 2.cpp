@@ -1,304 +1,182 @@
 #include <iostream>
-#include <string>
 #include <vector>
-#include <stdexcept>
 using namespace std;
 
-struct date {
-    int day;
-    int month;
-    int year;
-};
-
-class person {
-protected:
+class Person {
+private:
     string name;
     int age;
-    string id;
-    string contact_number;
+    int id;
+    string contactInfo;
 
 public:
-    person(string name, int age, string id, string contact_number) : name(name), age(age), id(id), contact_number(contact_number) {
-        if (name.empty()) throw invalid_argument("Name cannot be empty.");
-        if (age <= 0 || age > 130) throw invalid_argument("Age must be between 1 and 130.");
+    Person(string n, int a, int i, string c) : name(n), age(a), id(i), contactInfo(c) {}
+
+    virtual void displayDetails() {
+        cout << "Name: " << name << ", Age: " << age << ", ID: " << id << ", Contact: " << contactInfo << endl;
     }
 
-    virtual ~person() {}
-    virtual void getter() = 0;
-    virtual void setter() = 0;
-    virtual void display_details() = 0;
-    virtual double calculate_payment() = 0;
+    virtual double calculatePayment() { return 0.0; }
+
+    string getName() { return name; }
+    void setName(string n) { if (!n.empty()) name = n; }
+
+    int getAge() { return age; }
+    void setAge(int a) { if (a > 0 && a < 120) age = a; }
+
+    int getID() { return id; }
+    void setID(int i) { if (i > 0) id = i; }
+
+    string getContactInfo() { return contactInfo; }
+    void setContactInfo(string c) { if (!c.empty()) contactInfo = c; }
 };
 
-class student : public person {
+class Student : public Person {
 private:
-    date enrollment_date;
+    string enrollmentDate;
     string program;
-    float GPA;
+    double gpa;
 
 public:
-    student(string name, int age, string id, string contact_number, date enrollment_date, string program, float GPA = 0)
-        : person(name, age, id, contact_number), enrollment_date(enrollment_date), program(program), GPA(GPA) {
-        if (GPA < 0 || GPA > 4.0) throw invalid_argument("GPA must be between 0 and 4.0.");
+    Student(string n, int a, int i, string c, string ed, string p, double g)
+        : Person(n, a, i, c), enrollmentDate(ed), program(p), gpa(g) {}
+
+    void displayDetails() override {
+        cout << "Student: " << getName() << ", Age: " << getAge() << ", ID: " << getID()
+             << ", Contact: " << getContactInfo() << ", Enrollment: " << enrollmentDate
+             << ", Program: " << program << ", GPA: " << gpa << endl;
     }
 
-    ~student() {}
+    double calculatePayment() override { return 2000.0; }
 
-    void getter() override {
-        cout << "Name: " << name << endl;
-        cout << "Age: " << age << endl;
-        cout << "ID: " << id << endl;
-        cout << "Contact Number: " << contact_number << endl;
-        cout << "Enrollment date: " << enrollment_date.day << "/" << enrollment_date.month << "/" << enrollment_date.year << endl;
-        cout << "Program: " << program << endl;
-        cout << "GPA: " << GPA << endl;
-    }
+    string getProgram() { return program; }
+    void setProgram(string p) { if (!p.empty()) program = p; }
 
-    void setter() override {
-        int choice;
-        cout << "Choose what you need to change:" << endl << "1. Age" << endl << "2. Contact Number" << endl << "3. Enrollment date" << endl << "4. Program" << endl << "5. GPA" << endl;
-        cin >> choice;
-        switch (choice) {
-            case 1:
-                cin >> age;
-                if (age <= 0 || age > 130) throw invalid_argument("Age must be between 1 and 130.");
-                break;
-            case 2:
-                cin >> contact_number;
-                break;
-            case 3:
-                cout << "DD MM YYYY: ";
-                cin >> enrollment_date.day >> enrollment_date.month >> enrollment_date.year;
-                break;
-            case 4:
-                cin >> program;
-                break;
-            case 5:
-                cin >> GPA;
-                if (GPA < 0 || GPA > 4.0) throw invalid_argument("GPA must be between 0 and 4.0.");
-                break;
-            default:
-                cout << "Invalid Choice" << endl;
-                break;
-        }
-    }
-
-    void display_details() override {
-        getter();
-    }
-
-    double calculate_payment() override {
-        return 5000;
-    }
+    double getGPA() { return gpa; }
+    void setGPA(double g) { if (g >= 0.0 && g <= 4.0) gpa = g; }
 };
 
-class professor : public person {
+class Professor : public Person {
 private:
     string department;
     string specialization;
-    date hire_date;
+    string hireDate;
+    double salary;
 
 public:
-    professor(string name, int age, string id, string contact_number, string department, string specialization, date hire_date) : person(name, age, id, contact_number), department(department), specialization(specialization), hire_date(hire_date) {}
+    Professor(string n, int a, int i, string c, string d, string s, string hd, double sal)
+        : Person(n, a, i, c), department(d), specialization(s), hireDate(hd), salary(sal) {}
 
-    ~professor() {}
-
-    void getter() override {
-        cout << "Name: " << name << endl;
-        cout << "Age: " << age << endl;
-        cout << "Teacher ID: " << id << endl;
-        cout << "Contact Number: " << contact_number << endl;
-        cout << "Hiring Date: " << hire_date.day << "/" << hire_date.month << "/" << hire_date.year << endl;
-        cout << "Department: " << department << endl;
-        cout << "Specialization: " << specialization << endl;
+    void displayDetails() override {
+        cout << "Professor: " << getName() << ", Age: " << getAge() << ", ID: " << getID()
+             << ", Contact: " << getContactInfo() << ", Department: " << department
+             << ", Specialization: " << specialization << ", Hire Date: " << hireDate
+             << ", Salary: $" << salary << endl;
     }
 
-    void setter() override {
-        int choice;
-        cout << "Choose what you need to change:" << endl << "1. Age" << endl << "2. Contact Number" << endl << "3. Hire date" << endl << "4. Department" << endl << "5. Specialization" << endl;
-        cin >> choice;
-        switch (choice) {
-            case 1:
-                cin >> age;
-                if (age <= 0 || age > 130) throw invalid_argument("Age must be between 1 and 130.");
-                break;
-            case 2:
-                cin >> contact_number;
-                break;
-            case 3:
-                cout << "DD MM YYYY: ";
-                cin >> hire_date.day >> hire_date.month >> hire_date.year;
-                break;
-            case 4:
-                cin >> department;
-                break;
-            case 5:
-                cin >> specialization;
-                break;
-            default:
-                cout << "Invalid Choice" << endl;
-                break;
-        }
-    }
-
-    void display_details() override {
-        getter();
-    }
-
-    double calculate_payment() override {
-        return 8000;
-    }
+    double calculatePayment() override { return salary; }
 };
 
-class course {
+class Course {
 private:
     string code;
     string title;
-    float credits;
+    int credits;
     string description;
 
 public:
-    course(string code, string title, float credits, string description)
-        : code(code), title(title), credits(credits), description(description) {
-        if (credits <= 0) throw invalid_argument("Credits must be positive.");
-    }
+    Course(string c, string t, int cr, string d) : code(c), title(t), credits(cr), description(d) {}
 
-    ~course() {}
-
-    void getter() {
-        cout << "Code: " << code << endl;
-        cout << "Title: " << title << endl;
-        cout << "Credits: " << credits << endl;
-        cout << "Description: " << description << endl;
+    void displayDetails() {
+        cout << "Course: " << title << " (" << code << "), Credits: " << credits << ", Description: " << description << endl;
     }
 };
 
-class department {
+class Department {
 private:
     string name;
     string location;
     double budget;
 
 public:
-    department(string name, string location, double budget) : name(name), location(location), budget(budget) {}
+    Department(string n, string l, double b) : name(n), location(l), budget(b) {}
 
-    ~department() {}
-
-    void getter() {
-        cout << "Name: " << name << endl;
-        cout << "Location: " << location << endl;
-        cout << "Budget: " << budget << endl;
+    void displayDetails() {
+        cout << "Department: " << name << ", Location: " << location << ", Budget: $" << budget << endl;
     }
 };
 
 class GradeBook {
 private:
-    vector<string> studentIds;
-    vector<float> grades;
+    vector<pair<int, double>> studentGrades;
 
 public:
-    void add_grade(string id, float g) {
-        if (g >= 0 && g <= 100) {
-            studentIds.push_back(id);
-            grades.push_back(g);
-        } else {
-            throw invalid_argument("Grade must be between 0 and 100.");
-        }
+    void addGrade(int studentID, double grade) {
+        if (grade >= 0.0 && grade <= 100.0) studentGrades.push_back({studentID, grade});
     }
 
-    float calculate_average_grade() {
-        float total = 0;
-        for (float grade : grades) total += grade;
-        return grades.empty() ? 0 : total / grades.size();
+    double calculateAverageGrade() {
+        if (studentGrades.empty()) return 0.0;
+        double sum = 0.0;
+        for (auto &entry : studentGrades) sum += entry.second;
+        return sum / studentGrades.size();
     }
 
-    float get_highest_grade() {
-        float max = 0;
-        for (float grade : grades) if (grade > max) max = grade;
-        return max;
+    double getHighestGrade() {
+        double highest = 0.0;
+        for (auto &entry : studentGrades) if (entry.second > highest) highest = entry.second;
+        return highest;
     }
 
-    vector<string> get_failing_students() {
-        vector<string> fail;
-        for (int i = 0; i < grades.size(); i++) {
-            if (grades[i] < 40) fail.push_back(studentIds[i]);
-        }
-        return fail;
+    void getFailingStudents(double passThreshold) {
+        cout << "Failing Students:\n";
+        for (auto &entry : studentGrades) if (entry.second < passThreshold)
+            cout << "Student ID: " << entry.first << ", Grade: " << entry.second << endl;
     }
 };
 
 class EnrollmentManager {
 private:
-    vector<string> studentIds;
+    vector<int> studentIDs;
+    vector<string> courses;
 
 public:
-    void enroll_student(string id) {
-        studentIds.push_back(id);
+    void enrollStudent(int studentID, string course) {
+        studentIDs.push_back(studentID);
+        courses.push_back(course);
     }
 
-    void drop_student(string id) {
-        for (int i = 0; i < studentIds.size(); i++) {
-            if (studentIds[i] == id) {
-                studentIds.erase(studentIds.begin() + i);
+    void dropStudent(int studentID, string course) {
+        for (size_t i = 0; i < studentIDs.size(); i++) {
+            if (studentIDs[i] == studentID && courses[i] == course) {
+                studentIDs.erase(studentIDs.begin() + i);
+                courses.erase(courses.begin() + i);
                 break;
             }
         }
     }
 
-    int get_enrollment_count() {
-        return studentIds.size();
+    int getEnrollmentCount(string course) {
+        int count = 0;
+        for (const string &c : courses) if (c == course) count++;
+        return count;
     }
 };
 
-void show_person_details(person* p) {
-    try {
-        p->display_details();
-        cout << "Payment: " << p->calculate_payment() << endl;
-    } catch (const exception& e) {
-        cerr << "Error displaying person details: " << e.what() << endl;
-    }
+void testPolymorphism(Person* p) {
+    p->displayDetails();
+    cout << "Payment: $" << p->calculatePayment() << endl;
 }
 
 int main() {
-    try {
-        date d1 = {1, 1, 2020}, d2 = {15, 7, 2020}, d3 = {5, 3, 2015}, d4 = {9, 9, 2018};
+    vector<Person*> universityPeople = {
+        new Student("cheshna", 20, 101, "mehra@email.com", "2022", "Computer Science", 10.9),
+        new Professor("Dr. amandeep", 45, 201, "northcap@university.edu", "Engineering", "DS", "2010", 8000)
+    };
 
-        student s1("Aman", 20, "24CSU012", "6666666666", d1, "B.Tech", 3.5);
-        student s2("Harsh", 20, "24CSU013", "555555555", d2, "B.Sc", 2.9);
+    for (Person* p : universityPeople) testPolymorphism(p);
 
-        professor p1("Dr. Pratham", 45, "101", "777777777", "CSE", "AI & ML", d3);
-        professor p2("Dr. Swaran Ahuja", 50, "102", "123456789", "ECE", "Electrical", d4);
+    for (Person* p : universityPeople) delete p;
 
-        course c1("CS101", "CS", 3.0, "Basic concepts.");
-        course c2("BEEE", "Electrical", 3.0, "Electrical.");
-
-        department dpt1("CSE", "Block A", 5000000);
-        department dpt2("ECE", "Block B", 4000000);
-
-        GradeBook gb;
-        gb.add_grade("24CSU012", 85);
-        gb.add_grade("24CSU013", 35);
-
-        EnrollmentManager em;
-        em.enroll_student("24CSU012");
-        em.enroll_student("24CSU013");
-
-        person* people[] = {&s1, &s2, &p1, &p2};
-        for (int i = 0; i < 4; i++) {
-            show_person_details(people[i]);
-            cout << "---------------------" << endl;
-        }
-
-        cout << "Average Grade: " << gb.calculate_average_grade() << endl;
-        cout << "Highest Grade: " << gb.get_highest_grade() << endl;
-        vector<string> fail = gb.get_failing_students();
-        cout << "Failing Students: ";
-        for (string s : fail) cout << s << " ";
-        cout << endl;
-        cout << "Total Enrollment: " << em.get_enrollment_count() << endl;
-
-    } catch (const exception& e) {
-        cerr << "Initialization error: " << e.what() << endl;
-    }
     return 0;
 }
