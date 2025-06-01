@@ -1,120 +1,244 @@
 #include <iostream>
+#include <vector>
 using namespace std;
 
-// Base class
 class Person {
 protected:
     string name;
     int age;
+
 public:
     Person(string n, int a) : name(n), age(a) {}
+
     virtual void displayDetails() {
         cout << "Name: " << name << ", Age: " << age << endl;
     }
+
     virtual double calculatePayment() {
         return 0.0;
     }
 };
+
 class Student : public Person {
+protected:
+    double gpa;
+
 public:
-    Student(string n, int a) : Person(n, a) {}
+    Student(string n, int a, double g) : Person(n, a), gpa(g) {}
+
     void displayDetails() override {
-        cout << "Student - ";
-        Person::displayDetails();
-    }
-};
-class UndergraduateStudent : public Student {
-    string major;
-    string expgrdate;
-public:
-    UndergraduateStudent(string n, int a, string m,string d) : Student(n, a), major(m),expgrdate(d) {}
-    void displayDetails() override {
-        Student::displayDetails();
-        cout << "Major: " << major << endl;
-        cout << "Expected Graduation Date " << expgrdate << endl;
-    }
-};
-class GraduateStudent : public Student {
-    string thesis_title;
-    string research_topic;
-public:
-    GraduateStudent(string n, int a, string thesis,string t) : Student(n, a), thesis_title(thesis),research_topic(t) {}
-    void displayDetails() override {
-        Student::displayDetails();
-        cout << "Thesis Title: " << thesis_title << endl;
-        cout << "research topic" << research_topic << endl;
-    }
-    double calculatePayment() override {
-        return 1000.0; 
+        cout << "Student Name: " << name << ", Age: " << age << ", GPA: " << gpa << endl;
     }
 };
 
-// Professor class inherits from Person
+class UndergraduateStudent : public Student {
+private:
+    string major, minor;
+    int gradYear;
+
+public:
+    UndergraduateStudent(string n, int a, double g, string m, string mi, int gy) 
+        : Student(n, a, g), major(m), minor(mi), gradYear(gy) {}
+
+    void displayDetails() override {
+        cout << "Undergraduate Student: " << name << ", Age: " << age 
+             << ", GPA: " << gpa << ", Major: " << major 
+             << ", Minor: " << minor << ", Graduation Year: " << gradYear << endl;
+    }
+};
+
+class GraduateStudent : public Student {
+private:
+    string researchTopic, advisor, thesisTitle;
+    bool isTeachingAssistant, isResearchAssistant;
+
+public:
+    GraduateStudent(string n, int a, double g, string rt, string adv, string tt, bool ta, bool ra) 
+        : Student(n, a, g), researchTopic(rt), advisor(adv), thesisTitle(tt), 
+          isTeachingAssistant(ta), isResearchAssistant(ra) {}
+
+    void displayDetails() override {
+        cout << "Graduate Student: " << name << ", Age: " << age 
+             << ", GPA: " << gpa << ", Research Topic: " << researchTopic 
+             << ", Advisor: " << advisor << ", Thesis Title: " << thesisTitle 
+             << ", Teaching Assistant: " << (isTeachingAssistant ? "Yes" : "No") 
+             << ", Research Assistant: " << (isResearchAssistant ? "Yes" : "No") << endl;
+    }
+};
+
 class Professor : public Person {
 protected:
     double baseSalary;
+    int yearsOfService;
+    string academicRank;
+
 public:
-    Professor(string n, int a, double salary) : Person(n, a), baseSalary(salary) {}
+    Professor(string n, int a, double s, int y, string rank) 
+        : Person(n, a), baseSalary(s), yearsOfService(y), academicRank(rank) {}
+
     void displayDetails() override {
-        cout << "Professor - ";
-        Person::displayDetails();
+        cout << "Professor Name: " << name << ", Age: " << age 
+             << ", Base Salary: $" << baseSalary << ", Years of Service: " << yearsOfService 
+             << ", Rank: " << academicRank << endl;
     }
-    double calculatePayment() override {
-        return baseSalary;
+
+    virtual double calculatePayment() override {
+        return baseSalary + (yearsOfService * 500);
     }
 };
+
 class AssistantProfessor : public Professor {
+private:
+    int publications;
+
 public:
-    AssistantProfessor(string n, int a, double salary) : Professor(n, a, salary) {}
-    double calculatePayment() override {
-        return baseSalary + 100; 
+    AssistantProfessor(string n, int a, double s, int y, string rank, int p) 
+        : Professor(n, a, s, y, rank), publications(p) {}
+
+    void displayDetails() override {
+        cout << "Assistant Professor: " << name << ", Age: " << age 
+             << ", Salary: $" << calculatePayment() << ", Publications: " << publications << endl;
     }
 };
-class Classroom {
-    public:
-        string roomNumber;
-        Classroom(string n) : roomNumber(n) {}
-    
-        void displayDetails() const {
-            cout << "Classroom: " << roomNumber << endl;
+
+class AssociateProfessor : public Professor {
+private:
+    int tenureYears;
+
+public:
+    AssociateProfessor(string n, int a, double s, int y, string rank, int t) 
+        : Professor(n, a, s, y, rank), tenureYears(t) {}
+
+    void displayDetails() override {
+        cout << "Associate Professor: " << name << ", Age: " << age 
+             << ", Salary: $" << calculatePayment() << ", Tenure Years: " << tenureYears << endl;
+    }
+};
+
+class FullProfessor : public Professor {
+private:
+    double researchGrants;
+
+public:
+    FullProfessor(string n, int a, double s, int y, string rank, double rg) 
+        : Professor(n, a, s, y, rank), researchGrants(rg) {}
+
+    double calculatePayment() override {
+        return baseSalary + (yearsOfService * 500) + researchGrants;
+    }
+
+    void displayDetails() override {
+        cout << "Full Professor: " << name << ", Age: " << age 
+             << ", Salary: $" << calculatePayment() << ", Research Grants: $" << researchGrants << endl;
+    }
+};
+
+class Department {
+private:
+    string name;
+    vector<Professor*> professors;
+
+public:
+    Department(string n) : name(n) {}
+
+    void addProfessor(Professor* p) {
+        professors.push_back(p);
+    }
+
+    void displayProfessors() {
+        cout << "Department: " << name << endl;
+        for (Professor* p : professors) {
+            p->displayDetails();
         }
-    };
- class Schedule {
-        public:
-            string time;
-            string day;
-        
-            Schedule(string t, string d) : time(t), day(d) {}
-        
-            void displayDetails() const {
-                cout << "Time: " << time << ", Day: " << day << endl;
-            }
-      };
-     class Course:public Classroom {
-        string professor;
-        public:
-            Course(string p, string n) : professor(p),Classroom(n) {}
-            void displayDetails() const {
-                cout << " professor" <<professor << ", Room number" << roomNumber << endl;
-            }
-     };
+    }
+};
 
-// Main function to test
+class Course {
+private:
+    string courseName;
+    Professor* instructor;
+    vector<Student*> students;
+
+public:
+    Course(string cn, Professor* p) : courseName(cn), instructor(p) {}
+
+    void enrollStudent(Student* s) {
+        students.push_back(s);
+    }
+
+    void displayCourse() {
+        cout << "Course: " << courseName << endl;
+        instructor->displayDetails();
+        for (Student* s : students) {
+            s->displayDetails();
+        }
+    }
+};
+
+class University {
+private:
+    vector<Department*> departments;
+
+public:
+    void addDepartment(Department* d) {
+        departments.push_back(d);
+    }
+
+    void displayUniversity() {
+        for (Department* d : departments) {
+            d->displayProfessors();
+        }
+    }
+};
+
+class Classroom {
+private:
+    string roomNumber;
+    int capacity;
+
+public:
+    Classroom(string rn, int c) : roomNumber(rn), capacity(c) {}
+
+    void displayClassroom() {
+        cout << "Classroom: " << roomNumber << ", Capacity: " << capacity << endl;
+    }
+};
+
+class Schedule {
+private:
+    vector<string> timeSlots;
+
+public:
+    void addTimeSlot(string ts) {
+        timeSlots.push_back(ts);
+    }
+
+    void displaySchedule() {
+        for (string ts : timeSlots) {
+            cout << "Time Slot: " << ts << endl;
+        }
+    }
+};
+
 int main() {
-    UndergraduateStudent u("Shreya", 19, "Computer Science","10-01-2028");
-    GraduateStudent g("Karan", 23, "AI Discovery","Boons of AI");
-    AssistantProfessor p("Aman", 40, 50000);
+    University uni;
+    Department* csDept = new Department("Computer Science");
 
-    cout << "\n--- Undergraduate Student ---" << endl;
-    u.displayDetails();
+    FullProfessor* prof1 = new FullProfessor("Dr. Smith", 50, 10000, 20, "Senior", 50000);
+    csDept->addProfessor(prof1);
 
-    cout << "\n--- Graduate Student ---" << endl;
-    g.displayDetails();
-    cout << "Payment: " << g.calculatePayment() << endl;
+    uni.addDepartment(csDept);
+    uni.displayUniversity();
 
-    cout << "\n--- Assistant Professor ---" << endl;
-    p.displayDetails();
-    cout << "Payment: " << p.calculatePayment() << endl;
+    Course* algo = new Course("Algorithms", prof1);
+    Student* s1 = new UndergraduateStudent("Alice", 20, 3.8, "CS", "Math", 2026);
+    algo->enrollStudent(s1);
+    algo->displayCourse();
+
+    delete csDept;
+    delete prof1;
+    delete algo;
+    delete s1;
 
     return 0;
 }
